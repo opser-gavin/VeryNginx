@@ -11,22 +11,19 @@ import sys
 import getopt
 import filecmp
 
-openresty_pkg_url = 'https://openresty.org/download/openresty-1.11.2.3.tar.gz'
-openresty_pkg = 'openresty-1.11.2.3.tar.gz'
+openresty_pkg_url = 'https://openresty.org/download/openresty-1.25.3.1.tar.gz'
+openresty_pkg = 'openresty-1.25.3.1.tar.gz'
 
 work_path = os.getcwd()
 
 def install_openresty( ):
-    #check if the old version of VeryNginx installed( use upcase directory )
     if os.path.exists('/opt/VeryNginx/VeryNginx') == True:
         print("Seems that a old version of VeryNginx was installed in /opt/verynginx/...\nBefore install, please delete it and backup the configs if you need.")
         sys.exit(1)
     
-    #makesure the dir is clean
     print('### makesure the work directory is clean')
     exec_sys_cmd('rm -rf ' + openresty_pkg.replace('.tar.gz',''))
     
-    #download openresty
     down_flag = True
     if os.path.exists( './' + openresty_pkg ):
         ans = ''
@@ -45,10 +42,9 @@ def install_openresty( ):
     print('### release the package ...')
     exec_sys_cmd( 'tar -xzf ' + openresty_pkg )
 
-    #configure && compile && install openresty
     print('### configure openresty ...')
     os.chdir( openresty_pkg.replace('.tar.gz','') )
-    exec_sys_cmd( './configure --prefix=/opt/verynginx/openresty --user=nginx --group=nginx --with-http_v2_module --with-http_sub_module --with-http_stub_status_module --with-luajit' )
+    exec_sys_cmd( './configure --prefix=/opt/verynginx/openresty --user=nginx --group=nginx --with-http_v2_module --with-http_sub_module --with-http_stub_status_module --with-luajit --with-md5-cmodule' )
     
     print('### compile openresty ...')
     exec_sys_cmd( 'make' )
@@ -95,10 +91,7 @@ def exec_sys_cmd(cmd, accept_failed = False):
             return False
 
 def common_input( s ):
-    if sys.version_info.major == 3:
-        return input( s )
-    else:
-        return raw_input( s )
+    return input( s )
 
 def safe_pop(l):
     if len(l) == 0:

@@ -45,15 +45,12 @@ function _M.filter()
             --ngx.log(ngx.STDERR,key);
             
             local count_now = limit_dict:get( key )
-            --ngx.log(ngx.STDERR, tonumber(count_now) );
             
             if count_now == nil then
                 limit_dict:set( key, 1, tonumber(time) )
-                count_now = 0
+                count_now = 1
             end
             
-            limit_dict:incr( key, 1 )
-
             if count_now > tonumber(count) then
                 if rule['response'] ~= nil then
                     ngx.status = tonumber( rule['code'] )
@@ -67,6 +64,8 @@ function _M.filter()
                     ngx.exit( tonumber( rule['code'] ) )
                 end
             end
+            
+            limit_dict:incr( key, 1 )
             
             return
         end

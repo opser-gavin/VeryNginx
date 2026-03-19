@@ -122,7 +122,6 @@ function _M.test_args( condition )
     local operator = condition['operator']
     local value = condition['value']
 
-    --handle args behind uri
     for k,v in pairs( ngx.req.get_uri_args()) do
         if test_var( name_operator, name_value, k ) == true then
             if type(v) == "table" then
@@ -140,18 +139,11 @@ function _M.test_args( condition )
     end
     
     ngx.req.read_body()
-    --ensure body has not be cached into temp file
-    if ngx.req.get_body_file() ~= nil then
-        return false
-    end
-    
-    local body_args,err = ngx.req.get_post_args()
+    local body_args, err = ngx.req.get_post_args()
     if body_args == nil then
-        ngx.say("failed to get post args: ", err)
         return false
     end
     
-    --check args in body
     for k,v in pairs( body_args ) do
         if test_var( name_operator, name_value, k ) == true then
             if type(v) == "table" then

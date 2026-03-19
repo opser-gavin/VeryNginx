@@ -37,7 +37,7 @@ end
 
 function _M.ngx_ctx_load()
     local dump_str = ngx.var.vn_ctx_dump
-    if dump_str ~= '' then
+    if dump_str ~= nil and dump_str ~= '' then
         ngx.ctx = json.decode( dump_str ) 
     end
 end

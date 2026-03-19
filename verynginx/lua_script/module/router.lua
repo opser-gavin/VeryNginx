@@ -35,6 +35,10 @@ function _M.filter()
 
     if string.find( uri, base_uri ) == 1 then
         local path = string.sub( uri, string.len( base_uri ) + 1 )
+        
+        if path == "" or path == "/" then
+            path = "/index.html"
+        end
        
         for i,item in ipairs( _M.route_table ) do
             if method == item['method'] and path == item['path'] then

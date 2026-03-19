@@ -44,9 +44,9 @@ function _M.run()
                 end
 
                 if ngx_var.args ~= nil then
-                    ngx_redirect( new_url.."?"..ngx_var.args , ngx.HTTP_MOVED_TEMPORARILY)
+                    ngx_redirect( new_url.."?"..ngx_var.args )
                 else
-                    ngx_redirect( new_url , ngx.HTTP_MOVED_TEMPORARILY)
+                    ngx_redirect( new_url )
                 end
             end
             return

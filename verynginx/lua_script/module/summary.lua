@@ -24,7 +24,7 @@ local KEY_COLLECT_TIME = "H_"
 local KEY_COLLECT_COUNT = "I_"
 
 function _M.refresh()
-    local period = tonumber( VeryNginxConfig.configs["summary_request_enable"] )
+    local period = tonumber( VeryNginxConfig.configs["summary_temporary_period"] )
     
     if period == nil or period < 10 then
         period = 10
@@ -37,7 +37,7 @@ function _M.refresh()
 end
 
 function _M.pre_run_matcher()
-    if VeryNginxConfig.configs["summary_request_enable"] ~= true or VeryNginxConfig.configs["summary_collect_enable"] ~= true then
+    if VeryNginxConfig.configs["summary_request_enable"] ~= true then
         return
     end
     
