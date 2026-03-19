@@ -202,6 +202,37 @@ docker run verynginx
 
 当然你也可以运行 `docker run -p xxxx:80 verynginx` 来映射一下你的container的端口到你的宿主机，默认是80，你可以把xxxx改成你希望的在宿主机上的端口号
 
+## 修改说明
+
+### 代码优化（2026-03）
+
+本次更新专注于基础设施现代化及已知 Bug 修复，不改变任何现有功能。
+
+#### 1. 升级 OpenResty
+
+- 版本从 **1.9.15.1** 升级至 **1.15.8.1**，兼容 EL7（CentOS 7 / RHEL 7，glibc 2.17+）
+- 移除已废弃的 `--with-luajit` 编译参数（1.9.x 起已默认内置 LuaJIT）
+- 新增 `--with-http_ssl_module`（代理 SSL 指令所需）和 `--with-pcre-jit`（提升正则性能）
+- Docker 基础镜像从 `python:2.7.11-wheezy`（已 EOL）更新为 `debian:bookworm-slim` + Python 3
+
+#### 2. Lua 脚本 Bug 修复
+
+| 文件 | 问题 | 修复 |
+|------|------|------|
+| `module/browser_verify.lua` | 文件句柄 `f` 为全局变量 | 添加 `local` 关键字 |
+| `module/browser_verify.lua` | 赋值语句末尾多余的 `, ngx.HTTP_MOVED_TEMPORARILY`（Lua 逗号表达式，值被静默丢弃） | 移除多余值 |
+| `module/redirect.lua` | `replace_re` 为全局变量 | 添加 `local` 关键字 |
+| `module/uri_rewrite.lua` | `replace_re` 为全局变量 | 添加 `local` 关键字 |
+| `module/encrypt_seed.lua` | `dkjson.decode()` 返回 nil 时下一行立即崩溃 | 添加 nil 检查 |
+| `module/frequency_limit.lua` | `get` 和 `incr` 之间存在多 Worker 竞态条件 | 改用原子性 `incr(key, 1, 0, ttl)`（OpenResty 1.11.2+ 支持） |
+| `VeryNginxConfig.lua` | `t['node']` 为 nil 时 `setmetatable` 报错崩溃 | 添加 nil 检查 |
+
+#### 3. 修复管理面板 JS/CSS 失效
+
+所有外部资源原先从 `cdn.bootcss.com`（国内 CDN，国际访问不稳定）加载，现全部替换为 `cdnjs.cloudflare.com`（国际 CDN）。库版本保持不变。
+
+---
+
 ## 捐赠
 
 如果你喜欢 VeryNginx，那么你可以通过捐赠来支持我开发 VeryNginx。有了你的支持，我将可以让 VeryNginx 变的更好😎

@@ -44,15 +44,8 @@ function _M.filter()
             --ngx.log(ngx.STDERR,'-----');
             --ngx.log(ngx.STDERR,key);
             
-            local count_now = limit_dict:get( key )
-            --ngx.log(ngx.STDERR, tonumber(count_now) );
-            
-            if count_now == nil then
-                limit_dict:set( key, 1, tonumber(time) )
-                count_now = 0
-            end
-            
-            limit_dict:incr( key, 1 )
+            local new_count, err = limit_dict:incr( key, 1, 0, tonumber(time) )
+            local count_now = (new_count or 1) - 1
 
             if count_now > tonumber(count) then
                 if rule['response'] ~= nil then

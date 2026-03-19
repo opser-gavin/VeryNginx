@@ -27,9 +27,10 @@ function _M.get_seed()
         file:close();
         local tmp = dkjson.decode( data )
 
-        _M.seed = tmp['encrypt_seed']
-
-        return _M.seed
+        if tmp ~= nil then
+            _M.seed = tmp['encrypt_seed']
+            return _M.seed
+        end
     end
 
 

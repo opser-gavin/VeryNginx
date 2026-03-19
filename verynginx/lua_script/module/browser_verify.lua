@@ -57,7 +57,7 @@ function _M.verify_javascript()
     
     if _M.verify_javascript_html == nil then
         local path = VeryNginxConfig.home_path() .."/support/verify_javascript.html"
-        f = io.open( path, 'r' )
+        local f = io.open( path, 'r' )
         if f ~= nil then
             _M.verify_javascript_html = f:read("*all")
             f:close()
@@ -73,10 +73,10 @@ function _M.verify_javascript()
     html = string.gsub( html,'COOKIEPREFIX',cookie_prefix )
 
     if ngx.var.args ~= nil then
-		redirect_to =  ngx.var.scheme.."://"..ngx.var.http_host..ngx.var.uri.."?"..ngx.var.args , ngx.HTTP_MOVED_TEMPORARILY
-	else
-		redirect_to =  ngx.var.scheme.."://"..ngx.var.http_host..ngx.var.uri , ngx.HTTP_MOVED_TEMPORARILY
-	end
+        redirect_to = ngx.var.scheme.."://"..ngx.var.http_host..ngx.var.uri.."?"..ngx.var.args
+    else
+        redirect_to = ngx.var.scheme.."://"..ngx.var.http_host..ngx.var.uri
+    end
 
     html = util.string_replace( html,'INFOURI',redirect_to, 1 )
     

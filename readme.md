@@ -200,6 +200,37 @@ Then you can navigate to your browser `http://{{your_docker_machine_address}}/ve
 Optionally you can run `docker run -p xxxx:80 verynginx` to map your container port 80 to your host's xxxx port
 
 
+## Changelog
+
+### Code Optimization (2026-03)
+
+This update focuses on modernizing the infrastructure and fixing known bugs without changing any existing functionality.
+
+#### 1. OpenResty Upgrade
+
+- Upgraded from **1.9.15.1** to **1.15.8.1**, compatible with EL7 (CentOS 7 / RHEL 7, glibc 2.17+)
+- Removed obsolete `--with-luajit` build flag (LuaJIT is bundled by default since 1.9.x)
+- Added `--with-http_ssl_module` (required by proxy SSL directives) and `--with-pcre-jit` (improves regex performance)
+- Updated Docker base image from `python:2.7.11-wheezy` (EOL) to `debian:bookworm-slim` + Python 3
+
+#### 2. Lua Bug Fixes
+
+| File | Issue | Fix |
+|------|-------|-----|
+| `module/browser_verify.lua` | File handle `f` was a global variable | Added `local` keyword |
+| `module/browser_verify.lua` | Dangling `, ngx.HTTP_MOVED_TEMPORARILY` in assignment (silently discarded by Lua comma expression) | Removed the dangling value |
+| `module/redirect.lua` | `replace_re` was a global variable | Added `local` keyword |
+| `module/uri_rewrite.lua` | `replace_re` was a global variable | Added `local` keyword |
+| `module/encrypt_seed.lua` | `dkjson.decode()` returning nil caused a crash on the next line | Added nil guard |
+| `module/frequency_limit.lua` | Race condition between `get` and `incr` across workers | Replaced with atomic `incr(key, 1, 0, ttl)` (supported since OpenResty 1.11.2) |
+| `VeryNginxConfig.lua` | `setmetatable(t['node'], ...)` crashed when `t['node']` was nil | Added nil check |
+
+#### 3. Dashboard CDN Fix
+
+All external resources were loaded from `cdn.bootcss.com` (a Chinese CDN that is unreliable internationally). Replaced with `cdnjs.cloudflare.com` for global accessibility. Library versions are unchanged.
+
+---
+
 ## Donate
 
 If you like VeryNginx, you can donate to support my development VeryNginx. With your support, I will be able to make VeryNginx better 😎.

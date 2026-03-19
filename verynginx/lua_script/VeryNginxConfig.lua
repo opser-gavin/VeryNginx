@@ -373,7 +373,9 @@ function _M.set_config_metadata( config_table )
     if config_table['backend_upstream'] ~= nil then
         setmetatable( config_table['backend_upstream'], meta_table )
         for key, t in pairs( config_table["backend_upstream"] ) do
-            setmetatable( t['node'], meta_table )
+            if t['node'] ~= nil then
+                setmetatable( t['node'], meta_table )
+            end
         end
     end
     
